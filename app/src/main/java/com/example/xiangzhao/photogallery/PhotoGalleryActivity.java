@@ -19,7 +19,7 @@ public class PhotoGalleryActivity extends SingleFragmentActivity {
         PhotoGalleryFragment fragment = (PhotoGalleryFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.fragmentContainer);
 
-        if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             PreferenceManager.getDefaultSharedPreferences(this)
                     .edit()
