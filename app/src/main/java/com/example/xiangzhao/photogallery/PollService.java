@@ -1,9 +1,9 @@
 package com.example.xiangzhao.photogallery;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -20,8 +20,11 @@ import java.util.ArrayList;
  * Created by xiangzhao on 11/13/14.
  */
 public class PollService extends IntentService {
+    public static final String PREF_IS_ALARM_ON = "isAlarmOn";
+    public static final String ACTION_SHOW_NOTIFICATION =
+            "com.example.xiangzhao.photogallery.SHOW_NOTIFICATION";
+    public static final String PERM_PRIVATE = "com.example.xiangzhao.photogallery.PRIVATE";
     private static final String TAG = "PollService";
-
     private static final int POLL_INTERVAL = 1000 * 15; //15 seconds
 
     /**
@@ -45,6 +48,10 @@ public class PollService extends IntentService {
             pi.cancel();
         }
 
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean(PREF_IS_ALARM_ON, isOn)
+                .commit();
     }
 
     public static boolean isServiceAlarmOn(Context context) {
@@ -88,9 +95,8 @@ public class PollService extends IntentService {
                     .setContentIntent(pi)
                     .setAutoCancel(true)
                     .build();
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(0, notification);
+
+            showBackgroundNotification(0, notification);
 
 
         } else {
@@ -99,5 +105,13 @@ public class PollService extends IntentService {
 
         prefs.edit().putString(FlickrFetchr.PREF_LAST_RESULT_ID, resultId).commit();
 
+    }
+
+    void showBackgroundNotification(int requestCode, Notification notification) {
+        Intent i = new Intent(ACTION_SHOW_NOTIFICATION);
+        i.putExtra("REQUEST_CODE", requestCode);
+        i.putExtra("NOTIFICATION", notification);
+
+        sendOrderedBroadcast(i, PERM_PRIVATE, null, null, Activity.RESULT_OK, null, null);
     }
 }
